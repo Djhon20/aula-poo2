@@ -3,196 +3,206 @@ import java.awt.EventQueue;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import javax.swing.JFormattedTextField;
-import javax.swing.text.MaskFormatter;
 
 import javax.swing.*;
-import java.awt.*;
+import javax.swing.text.MaskFormatter;
 import java.awt.event.*;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.layout.FormSpecs;
+import com.jgoodies.forms.layout.RowSpec;
 
 public class formulario extends JFrame {
-	
-private static final long serialVersionUID = 1L;
-	
-	private JTextField txtnome;
-	private JTextField txtNomeCompleto;
-	private JTextField txtdatanascimento;
-	private JTextField txtidade;
-	private JLabel lblNewLabel_3;
-	private JTextField txtcpf;
-	private JLabel lblNewLabel_4;
-	private JTextField txtcep;
-	private JLabel lblNewLabel_6;
-	private JTextField txtend;
-	private JLabel lblNewLabel_7;
-	private JTextField txtobs;
-	private JTextField txtnomepai;
-	private JTextField txtnomemae;
-	private JLabel lblNewLabel_8;
-	private JLabel lblNewLabel_9;
-	
 
-	
-	
-	
-	public formulario() {
-		getContentPane().setLayout(null);
-		
-		txtNomeCompleto = new JTextField();
-		txtNomeCompleto.setBounds(92, 22, 249, 20);
-		getContentPane().add(txtNomeCompleto);
-		txtNomeCompleto.setColumns(55);
-		
-		JLabel lblNewLabel = new JLabel("Nome Completo:");
-		lblNewLabel.setBounds(10, 25, 79, 14);
-		getContentPane().add(lblNewLabel);
-		
-		JLabel lblNewLabel_1 = new JLabel("Data de Nascimento:");
-		lblNewLabel_1.setBounds(10, 51, 109, 14);
-		getContentPane().add(lblNewLabel_1);
-		
-		try {
-		    MaskFormatter mascaraData = new MaskFormatter("##/##/####");
-		    mascaraData.setPlaceholderCharacter('_');
-		    txtdatanascimento = new JFormattedTextField(mascaraData);
-		    txtdatanascimento.setBounds(112, 50, 64, 20);
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
-		getContentPane().add(txtdatanascimento);
-		txtdatanascimento.setColumns(10);
-		
-		JLabel lblNewLabel_2 = new JLabel("Idade:");
-		lblNewLabel_2.setBounds(214, 51, 46, 14);
-		getContentPane().add(lblNewLabel_2);
-		
-		txtidade = new JTextField();
-		txtidade.setBounds(270, 53, 64, 20);
-		txtidade.addFocusListener(new FocusAdapter() {
-			
-		});
-		getContentPane().add(txtidade);
-		txtidade.setColumns(10);
-		
-		lblNewLabel_3 = new JLabel("CPF:");
-		lblNewLabel_3.setBounds(10, 110, 46, 14);
-		getContentPane().add(lblNewLabel_3);
-		
-		txtcpf = new JTextField();
-		txtcpf.setBounds(40, 107, 301, 20);
-		getContentPane().add(txtcpf);
-		txtcpf.setColumns(15);
-		
-		lblNewLabel_4 = new JLabel("Sexo");
-		lblNewLabel_4.setBounds(10, 142, 46, 14);
-		getContentPane().add(lblNewLabel_4);
-		
-		JComboBox cbsexo = new JComboBox();
-		cbsexo.setBounds(46, 138, 94, 22);
-		cbsexo.setModel(new DefaultComboBoxModel(new String[] {"Masculino", "Feminino"}));
-		getContentPane().add(cbsexo);
-		
-		JLabel lblNewLabel_5 = new JLabel("CEP:");
-		lblNewLabel_5.setBounds(10, 167, 23, 14);
-		getContentPane().add(lblNewLabel_5);
-		
-		txtcep = new JTextField();
-		txtcep.setBounds(40, 167, 301, 20);
-		getContentPane().add(txtcep);
-		txtcep.setColumns(10);
-		
-		lblNewLabel_6 = new JLabel("Endereço:");
-		lblNewLabel_6.setBounds(10, 198, 92, 14);
-		getContentPane().add(lblNewLabel_6);
-		
-		txtend = new JTextField();
-		txtend.setBounds(64, 195, 277, 20);
-		getContentPane().add(txtend);
-		txtend.setColumns(10);
-		
-		lblNewLabel_7 = new JLabel("Observações:");
-		lblNewLabel_7.setBounds(10, 243, 76, 14);
-		getContentPane().add(lblNewLabel_7);
-		
-		txtobs = new JTextField();
-		txtobs.setBounds(84, 223, 257, 48);
-		getContentPane().add(txtobs);
-		txtobs.setColumns(10);
-		
-		txtnomepai = new JTextField();
-		txtnomepai.setBounds(64, 295, 277, 20);
-		getContentPane().add(txtnomepai);
-		txtnomepai.setColumns(10);
-		
-		txtnomemae = new JTextField();
-		txtnomemae.setBounds(66, 326, 275, 20);
-		getContentPane().add(txtnomemae);
-		txtnomemae.setColumns(10);
-		
-		lblNewLabel_8 = new JLabel("Nome Pai:");
-		lblNewLabel_8.setBounds(10, 298, 92, 14);
-		getContentPane().add(lblNewLabel_8);
-		
-		lblNewLabel_9 = new JLabel("Nome Mãe:");
-		lblNewLabel_9.setBounds(10, 329, 92, 14);
-		getContentPane().add(lblNewLabel_9);
-		
-		JCheckBox chckbxNewCheckBox = new JCheckBox("Possui Filhos");
-		chckbxNewCheckBox.setBounds(64, 353, 97, 23);
-		getContentPane().add(chckbxNewCheckBox);
-		
-		JButton btnSalvar = new JButton("Salvar");
-		btnSalvar.setBounds(156, 413, 89, 23);
-		btnSalvar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		getContentPane().add(btnSalvar);
-	
-		txtdatanascimento.addFocusListener(new FocusAdapter() {
-		    @Override
-		    public void focusLost(FocusEvent e) {
-		        try {
-		            String data = txtdatanascimento.getText();
-		            
-		            // Formato esperado: dd/MM/yyyy
-		            java.time.format.DateTimeFormatter formatter = 
-		                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		            
-		            java.time.LocalDate nascimento = 
-		                java.time.LocalDate.parse(data, formatter);
-		            
-		            java.time.LocalDate hoje = java.time.LocalDate.now();
-		            
-		            int idade = java.time.Period.between(nascimento, hoje).getYears();
-		            
-		            txtidade.setText(String.valueOf(idade));
-		            
-		        } catch (Exception ex) {
-		            JOptionPane.showMessageDialog(null, "Data inválida! Use dd/MM/yyyy");
-		        }
-		    }
-		});
-	}
-	
+    private static final long serialVersionUID = 1L;
 
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					formulario frame = new formulario();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+    private JTextField txtNomeCompleto;
+    private JFormattedTextField txtdatanascimento;
+    private JTextField txtidade;
+    private JTextField txtcpf;
+    private JTextField txtcep;
+    private JTextField txtend;
+    private JTextField txtobs;
+    private JTextField txtnomepai;
+    private JTextField txtnomemae;
+
+    public formulario() {
+
+        setTitle("Formulário");
+        setSize(400, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        getContentPane().setLayout(null);
+
+        // Nome
+        JLabel lblNome = new JLabel("Nome Completo:");
+        lblNome.setBounds(10, 20, 120, 14);
+        getContentPane().add(lblNome);
+
+        txtNomeCompleto = new JTextField();
+        txtNomeCompleto.setBounds(130, 20, 200, 20);
+        getContentPane().add(txtNomeCompleto);
+
+        // Data nascimento
+        JLabel lblData = new JLabel("Data Nasc:");
+        lblData.setBounds(10, 51, 120, 14);
+        getContentPane().add(lblData);
+
+        try {
+            MaskFormatter mascara = new MaskFormatter("##/##/####");
+            txtdatanascimento = new JFormattedTextField(mascara);
+            txtdatanascimento.setBounds(130, 51, 80, 20);
+            getContentPane().add(txtdatanascimento);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Idade
+        JLabel lblIdade = new JLabel("Idade:");
+        lblIdade.setBounds(220, 51, 50, 14);
+        getContentPane().add(lblIdade);
+
+        txtidade = new JTextField();
+        txtidade.setBounds(270, 51, 60, 20);
+        txtidade.setEditable(false);
+        getContentPane().add(txtidade);
+
+        // Evento calcular idade
+        txtdatanascimento.addFocusListener(new FocusAdapter() {
+            public void focusLost(FocusEvent e) {
+                try {
+                    String data = txtdatanascimento.getText();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    LocalDate nascimento = LocalDate.parse(data, formatter);
+                    LocalDate hoje = LocalDate.now();
+
+                    int idade = Period.between(nascimento, hoje).getYears();
+                    txtidade.setText(String.valueOf(idade));
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Data inválida!");
+                    txtidade.setText("");
+                }
+            }
+        });
+
+        // CPF
+        JLabel lblCpf = new JLabel("CPF:");
+        lblCpf.setBounds(10, 82, 23, 14);
+        getContentPane().add(lblCpf);
+
+        txtcpf = new JTextField();
+        txtcpf.setBounds(130, 82, 200, 20);
+        getContentPane().add(txtcpf);
+
+        // CEP
+        JLabel lblCep = new JLabel("CEP:");
+        lblCep.setBounds(10, 113, 23, 14);
+        getContentPane().add(lblCep);
+
+        txtcep = new JTextField();
+        txtcep.setBounds(130, 113, 200, 20);
+        getContentPane().add(txtcep);
+
+        // Validação do CEP ao sair do campo
+        txtcep.addFocusListener(new FocusAdapter() {
+            public void focusLost(FocusEvent e) {
+                String cep = txtcep.getText().replaceAll("\\D", "");
+
+                if (!cep.isEmpty() && cep.length() != 8) {
+                    JOptionPane.showMessageDialog(null, "CEP inválido!");
+                    txtcep.requestFocus();
+                }
+            }
+        });
+
+        // Endereço
+        JLabel lblEnd = new JLabel("Endereço:");
+        lblEnd.setBounds(10, 144, 49, 14);
+        getContentPane().add(lblEnd);
+
+        txtend = new JTextField();
+        txtend.setBounds(130, 144, 200, 20);
+        getContentPane().add(txtend);
+
+        // Observações
+        JLabel lblObs = new JLabel("Obs:");
+        lblObs.setBounds(10, 175, 120, 14);
+        getContentPane().add(lblObs);
+
+        txtobs = new JTextField();
+        txtobs.setBounds(130, 175, 200, 40);
+        getContentPane().add(txtobs);
+
+        // Pai
+        JLabel lblPai = new JLabel("Nome Pai:");
+        lblPai.setBounds(10, 226, 48, 14);
+        getContentPane().add(lblPai);
+
+        txtnomepai = new JTextField();
+        txtnomepai.setBounds(130, 226, 200, 20);
+        getContentPane().add(txtnomepai);
+
+        // Mãe
+        JLabel lblMae = new JLabel("Nome Mãe:");
+        lblMae.setBounds(10, 257, 120, 14);
+        getContentPane().add(lblMae);
+
+        txtnomemae = new JTextField();
+        txtnomemae.setBounds(130, 257, 200, 20);
+        getContentPane().add(txtnomemae);
+
+        // Botão salvar
+        JButton btnSalvar = new JButton("Salvar");
+        btnSalvar.setBounds(168, 307, 63, 30);
+        getContentPane().add(btnSalvar);
+
+        // Evento salvar
+        btnSalvar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                // 🔴 Validações
+                if (txtNomeCompleto.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Informe o nome!");
+                    return;
+                }
+
+                if (txtdatanascimento.getText().contains("_")) {
+                    JOptionPane.showMessageDialog(null, "Data inválida!");
+                    return;
+                }
+
+                if (txtcpf.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Informe o CPF!");
+                    return;
+                }
+
+                if (txtcep.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Informe o CEP!");
+                    return;
+                }
+
+                // 🟢 Coletando dados
+                String dados =
+                        "Nome: " + txtNomeCompleto.getText() +
+                        "\nData: " + txtdatanascimento.getText() +
+                        "\nIdade: " + txtidade.getText() +
+                        "\nCPF: " + txtcpf.getText() +
+                        "\nCEP: " + txtcep.getText() +
+                        "\nEndereço: " + txtend.getText();
+
+                JOptionPane.showMessageDialog(null, "Salvo com sucesso!\n\n" + dados);
+            }
+        });
+    }
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                formulario frame = new formulario();
+                frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
 }
