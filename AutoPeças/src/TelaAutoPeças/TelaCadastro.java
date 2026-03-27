@@ -1,6 +1,8 @@
 package TelaAutoPeças;
 
 import java.awt.EventQueue;
+import java.awt.event.*;
+import javax.swing.*;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -90,7 +92,21 @@ public class TelaCadastro extends JFrame {
 		btnSalvar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				if (txtpeça.getText().trim().isEmpty() 
+				if (txtpeça.getText().trim().isEmpty()) {
+					JOptionPane.showMessageDialog(null, "informe o nome da peça");
+					return;
+				}
+				
+				if (txtserial.getText().trim().isEmpty()) {
+					JOptionPane.showMessageDialog(null, "informar o numero serial da peça");
+					return;
+				}
+				
+				if (txtcarro.getText().trim().isEmpty()) {
+					JOptionPane.showMessageDialog(null, "informar o modelo do carro");
+					return;
+				}
+					
 		
 		
 		
