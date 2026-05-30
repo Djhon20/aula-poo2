@@ -15,7 +15,7 @@ public class CRUD {
 		
 		
 		//metodo try para tratamento
-		try (Connection conn = ConnectionFactory.getConexao();
+		try (Connection conn = ConnectionFactory.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)){
 			
 			//preenche os ? na ordem exata
