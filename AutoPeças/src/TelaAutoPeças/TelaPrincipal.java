@@ -40,6 +40,19 @@ public class TelaPrincipal extends JFrame {
 	private JTable tabelaClientes;
 	private DefaultTableModel modeloClientes;
 	private JButton btnEditarCliente;
+	// Componentes da aba Vendas
+	private javax.swing.JComboBox<String> cbClientesVenda;
+	private javax.swing.JComboBox<String> cbPecasVenda;
+	private JTextField txtQtdVenda;
+	private JTable tabelaCarrinho;
+	private DefaultTableModel modeloCarrinho;
+	private JLabel lblTotalVenda;
+	private javax.swing.JComboBox<String> cbPagamento;
+
+	// Listas para mapear os IDs reais que estão dentro dos ComboBoxes
+	private java.util.List<Integer> listaIdsClientes = new java.util.ArrayList<>();
+	private java.util.List<Object[]> listaDadosPecas = new java.util.ArrayList<>();
+	private double totalGeralVenda = 0.0;
 
 	/**
 	 * Launch the application (Para o WindowBuilder e testes isolados)
@@ -306,11 +319,205 @@ public class TelaPrincipal extends JFrame {
 		// =====================================================================
 		// ABA 3: VENDAS (Apenas um painel vazio aguardando o futuro)
 		// =====================================================================
-		JPanel pnlVendas = new JPanel();
-		pnlVendas.setBackground(Color.WHITE);
-		pnlVendas.add(new JLabel("Área de Frente de Caixa / Vendas (Breve...)"));
-		abasSistema.addTab("Vendas", null, pnlVendas, "Histórico e Emissão de Vendas");
-		
+				// =====================================================================
+				// ABA 3: VENDAS
+				// =====================================================================
+				JPanel pnlVendas = new JPanel();
+				pnlVendas.setLayout(null);
+				pnlVendas.setBackground(new Color(240, 245, 240));
+				abasSistema.addTab("Vendas", null, pnlVendas, "Efetuar Vendas e Recebimentos");
+
+				// Seleção do Cliente
+				JLabel lblSelectCli = new JLabel("Selecionar Cliente:");
+				lblSelectCli.setBounds(30, 30, 120, 20);
+				pnlVendas.add(lblSelectCli);
+
+				cbClientesVenda = new javax.swing.JComboBox<>();
+				cbClientesVenda.setBounds(150, 30, 300, 25);
+				pnlVendas.add(cbClientesVenda);
+
+				// Seleção da Peça
+				JLabel lblSelectPeca = new JLabel("Selecionar Peça:");
+				lblSelectPeca.setBounds(30, 80, 120, 20);
+				pnlVendas.add(lblSelectPeca);
+
+				cbPecasVenda = new javax.swing.JComboBox<>();
+				cbPecasVenda.setBounds(150, 80, 300, 25);
+				pnlVendas.add(cbPecasVenda);
+
+				// Quantidade da Venda
+				JLabel lblQtdVenda = new JLabel("Quantidade:");
+				lblQtdVenda.setBounds(30, 130, 120, 20);
+				pnlVendas.add(lblQtdVenda);
+
+				txtQtdVenda = new JTextField();
+				txtQtdVenda.setBounds(150, 130, 80, 25);
+				pnlVendas.add(txtQtdVenda);
+
+				JButton btnAddCarrinho = new JButton("Adicionar ao Carrinho");
+				btnAddCarrinho.setBounds(250, 130, 200, 25);
+				pnlVendas.add(btnAddCarrinho);
+
+				// Tabela do Carrinho de Compras
+				JLabel lblCarrinho = new JLabel("Itens no Carrinho:");
+				lblCarrinho.setBounds(480, 10, 150, 20);
+				pnlVendas.add(lblCarrinho);
+
+				JScrollPane scrollCarrinho = new JScrollPane();
+				scrollCarrinho.setBounds(480, 30, 850, 350);
+				pnlVendas.add(scrollCarrinho);
+
+				modeloCarrinho = new DefaultTableModel(
+					new Object[][] {},
+					new String[] { "ID Peça", "Nome do Produto", "Qtd", "Preço Unitário", "Subtotal" }
+				) {
+					@Override
+					public boolean isCellEditable(int row, int column) { return false; }
+				};
+
+				tabelaCarrinho = new JTable(modeloCarrinho);
+				scrollCarrinho.setViewportView(tabelaCarrinho);
+
+				// Painel de Fechamento / Registro de Pagamento
+				JPanel pnlPagamento = new JPanel();
+				pnlPagamento.setBorder(javax.swing.BorderFactory.createTitledBorder("Fechamento do Pedido"));
+				pnlPagamento.setBackground(new Color(230, 235, 230));
+				pnlPagamento.setBounds(480, 400, 850, 150);
+				pnlPagamento.setLayout(null);
+				pnlVendas.add(pnlPagamento);
+
+				lblTotalVenda = new JLabel("TOTAL GERAL: R$ 0.00");
+				lblTotalVenda.setFont(new Font("Arial", Font.BOLD, 18));
+				lblTotalVenda.setForeground(new Color(150, 30, 30));
+				lblTotalVenda.setBounds(30, 40, 300, 30);
+				pnlPagamento.add(lblTotalVenda);
+
+				JLabel lblFormaPag = new JLabel("Forma de Pagamento:");
+				lblFormaPag.setBounds(30, 90, 150, 20);
+				pnlPagamento.add(lblFormaPag);
+
+				cbPagamento = new javax.swing.JComboBox<>(new String[] { "Dinheiro", "Cartão de Crédito", "Cartão de Débito", "Pix" });
+				cbPagamento.setBounds(180, 90, 180, 25);
+				pnlPagamento.add(cbPagamento);
+
+				JButton btnFinalizarVenda = new JButton("✨ Finalizar e Registrar Venda");
+				btnFinalizarVenda.setBackground(new Color(50, 120, 50));
+				btnFinalizarVenda.setForeground(Color.WHITE);
+				btnFinalizarVenda.setFont(new Font("Arial", Font.BOLD, 14));
+				btnFinalizarVenda.setBounds(550, 50, 250, 60);
+				pnlPagamento.add(btnFinalizarVenda);
+
+				// Button para esvaziar carrinho
+				JButton btnLimparCarrinho = new JButton("Limpar Carrinho");
+				btnLimparCarrinho.setBounds(30, 180, 150, 25);
+				pnlVendas.add(btnLimparCarrinho);
+
+				// =====================================================================
+				// LÓGICAS DA ABA DE VENDAS
+				// =====================================================================
+
+				
+				
+				// 1. Ação de Adicionar Peça ao Carrinho
+				btnAddCarrinho.addActionListener(e -> {
+					int indexPeca = cbPecasVenda.getSelectedIndex();
+					if (indexPeca < 0) return;
+					
+					String qtdStr = txtQtdVenda.getText().trim();
+					if (qtdStr.isEmpty()) {
+						JOptionPane.showMessageDialog(this, "Informe a quantidade desejada!");
+						return;
+					}
+
+					try {
+						int qtdDesejada = Integer.parseInt(qtdStr);
+						Object[] pecaSelecionada = listaDadosPecas.get(indexPeca);
+						
+						int idPeca = (int) pecaSelecionada[0];
+						String nomePeca = pecaSelecionada[1].toString();
+						int estoqueAtual = (int) pecaSelecionada[2];
+						double precoUnit = (double) pecaSelecionada[3];
+
+						if (qtdDesejada <= 0) {
+							JOptionPane.showMessageDialog(this, "A quantidade deve ser maior que zero!");
+							return;
+						}
+
+						if (qtdDesejada > estoqueAtual) {
+							JOptionPane.showMessageDialog(this, "Estoque insuficiente! Estoque atual: " + estoqueAtual);
+							return;
+						}
+
+						double subtotal = qtdDesejada * precoUnit;
+						
+						// Adiciona o item na tabela do carrinho
+						modeloCarrinho.addRow(new Object[] { idPeca, nomePeca, qtdDesejada, precoUnit, subtotal });
+						
+						// Atualiza o total acumulado
+						totalGeralVenda += subtotal;
+						lblTotalVenda.setText(String.format("TOTAL GERAL: R$ %.2f", totalGeralVenda));
+						txtQtdVenda.setText("");
+
+					} catch (NumberFormatException ex) {
+						JOptionPane.showMessageDialog(this, "Digite uma quantidade numérica válida!");
+					}
+				});
+
+				// 2. Ação de Limpar o Carrinho
+				btnLimparCarrinho.addActionListener(e -> {
+					modeloCarrinho.setRowCount(0);
+					totalGeralVenda = 0.0;
+					lblTotalVenda.setText("TOTAL GERAL: R$ 0.00");
+				});
+
+				// 3. Ação do Botão de Finalizar Venda
+				btnFinalizarVenda.addActionListener(e -> {
+					if (cbClientesVenda.getSelectedIndex() < 0) {
+						JOptionPane.showMessageDialog(this, "Cadastre um cliente antes de realizar uma venda!");
+						return;
+					}
+					if (modeloCarrinho.getRowCount() == 0) {
+						JOptionPane.showMessageDialog(this, "O carrinho está vazio! Adicione itens para vender.");
+						return;
+					}
+
+					int clienteId = listaIdsClientes.get(cbClientesVenda.getSelectedIndex());
+					String formaPagto = cbPagamento.getSelectedItem().toString();
+
+					// Extrai a lista de itens do carrinho para enviar ao DAO
+					java.util.List<Object[]> itensCarrinho = new java.util.ArrayList<>();
+					for (int i = 0; i < modeloCarrinho.getRowCount(); i++) {
+						int pecaId = (int) modeloCarrinho.getValueAt(i, 0);
+						int qtd = (int) modeloCarrinho.getValueAt(i, 2);
+						double preco = (double) modeloCarrinho.getValueAt(i, 3);
+						itensCarrinho.add(new Object[] { pecaId, null, qtd, preco });
+					}
+
+					DAOAutoPeças.VendaDAO vendaDAO = new DAOAutoPeças.VendaDAO();
+					if (vendaDAO.registrarVenda(clienteId, totalGeralVenda, formaPagto, itensCarrinho)) {
+						JOptionPane.showMessageDialog(this, "Venda registrada e paga com sucesso!\nEstoque atualizado.");
+						
+						// Reseta os componentes de venda
+						modeloCarrinho.setRowCount(0);
+						totalGeralVenda = 0.0;
+						lblTotalVenda.setText("TOTAL GERAL: R$ 0.00");
+						
+						// Atualiza os componentes globais e a tabela da aba de estoque de peças
+						carregarCombosVenda();
+						atualizarTabelaVisual(); 
+					} else {
+						JOptionPane.showMessageDialog(this, "Erro crítico ao processar o fechamento da venda.", "Erro", JOptionPane.ERROR_MESSAGE);
+					}
+				});
+
+				// 4. Listener para atualizar os Combos sempre que o usuário clicar na Aba Vendas
+				abasSistema.addChangeListener(e -> {
+					if (abasSistema.getSelectedIndex() == 2) { // Índice 2 representa a Aba de Vendas
+						carregarCombosVenda();
+					}
+				});
+				
+				
 		// =====================================================================
 		// EVENTOS E LÓGICAS DO CRUD DE PEÇAS
 		// =====================================================================
@@ -441,6 +648,31 @@ public class TelaPrincipal extends JFrame {
 		
 		for (Object[] peca : pecasDoBanco) {
 			modeloTabela.addRow(peca); // Preenche a tabela visual linha por linha
-		}
+			
+			carregarCombosVenda();
+	    } // Fim do construtor
+		
+	}
+	private void carregarCombosVenda() {
+	    cbClientesVenda.removeAllItems();
+	    listaIdsClientes.clear();
+	    
+	    // Carrega Clientes
+	    DAOAutoPeças.ClienteDAO cliDAO = new DAOAutoPeças.ClienteDAO();
+	    List<Object[]> clientes = cliDAO.buscarPorNome(""); // Traz todos
+	    for (Object[] c : clientes) {
+	        listaIdsClientes.add((Integer) c[0]); // Guarda o ID real
+	        cbClientesVenda.addItem(c[1].toString() + " (CPF: " + c[2].toString() + ")");
+	    }
+
+	    cbPecasVenda.removeAllItems();
+	    listaDadosPecas.clear();
+	    
+	    // Carrega Peças
+	    DAOAutoPeças.PecaDAO pecaDAO = new DAOAutoPeças.PecaDAO();
+	    listaDadosPecas = pecaDAO.listarTodos();
+	    for (Object[] p : listaDadosPecas) {
+	        cbPecasVenda.addItem(p[1].toString() + " - R$ " + p[3].toString() + " [Qtd: " + p[2].toString() + "]");
+	    }
 	}
 }
