@@ -9,14 +9,14 @@ import ConAutoPeças.ConnectionFactory;
 public class UsuarioDAO {
 
     // Método simples que retorna verdadeiro se encontrar o usuário e senha no banco
-    public boolean autenticarUsuario(String login, String senha) {
+    public String autenticarUsuario(String login, String senha) {
         Connection conn = null;
         PreparedStatement pstm = null;
         ResultSet rs = null;
-        boolean existe = false;
+        String nomeUsuario = null;
 
-        // SQL direto comparando usuário e senha em texto limpo
-        String sql = "SELECT * FROM usuarios WHERE login = ? AND senha = ?";
+        
+        String sql = "SELECT nome FROM usuarios WHERE login = ? AND senha = ?";
 
         try {
             conn = ConnectionFactory.getConnection(); // Abre a conexão usando sua factory
@@ -28,7 +28,12 @@ public class UsuarioDAO {
 
             // Se o rs.next() for verdadeiro, significa que achou uma linha correspondente
             if (rs.next()) {
-                existe = true; 
+                nomeUsuario = rs.getString("nome");
+                
+                // Caso o nome esteja vazio no banco, usamos o próprio login como garantia
+                if (nomeUsuario == null || nomeUsuario.trim().isEmpty()) {
+                    nomeUsuario = login;
+                }
             }
 
         } catch (SQLException e) {
@@ -40,6 +45,28 @@ public class UsuarioDAO {
             try { if (conn != null) conn.close(); } catch (Exception e) {}
         }
 
-        return existe;
+        return nomeUsuario;
     }
+
+
+	public boolean cadastrarUsuario(String nome, String login,String senha) {
+		Connection conn = null;
+	    PreparedStatement pstm = null;
+	    String sql = "INSERT INTO usuarios (nome, login, senha) VALUES (?, ?, ?)";
+	    try {
+	        conn = ConnectionFactory.getConnection();
+	        pstm = conn.prepareStatement(sql);
+	        pstm.setString(1, nome);
+	        pstm.setString(2, login);
+	        pstm.setString(3, senha);
+	        pstm.execute();
+	        return true;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    } finally {
+	        try { if (pstm != null) pstm.close(); } catch (Exception e) {}
+	        try { if (conn != null) conn.close(); } catch (Exception e) {}
+	    }
+	}
 }
