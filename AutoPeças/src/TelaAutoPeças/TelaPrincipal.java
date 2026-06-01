@@ -22,7 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 import DAOAutoPeças.PecaDAO; // Importação do DAO de peças
-import DAOAutoPeças.ClienteDAO;
+import DAOAutoPeças.ClienteDAO; //import de dao clientes
 public class TelaPrincipal extends JFrame {
 
 	private static final long serialVersionUID = 1L;
