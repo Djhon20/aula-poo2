@@ -48,6 +48,12 @@ public class TelaPrincipal extends JFrame {
 	private DefaultTableModel modeloCarrinho;
 	private JLabel lblTotalVenda;
 	private javax.swing.JComboBox<String> cbPagamento;
+	// Componentes da aba Controle de Caixa
+	private JLabel lblStatusCaixa;
+	private JLabel lblFaturamentoCaixa;
+	private JTextField txtValorInicialCaixa;
+	private JButton btnAbrirCaixa;
+	private JButton btnFecharCaixa;
 
 	// Listas para mapear os IDs reais que estão dentro dos ComboBoxes
 	private java.util.List<Integer> listaIdsClientes = new java.util.ArrayList<>();
@@ -316,6 +322,78 @@ public class TelaPrincipal extends JFrame {
 					}
 				});
 
+				modeloCarrinho = new DefaultTableModel(
+					new Object[][] {},
+					new String[] { "ID Peça", "Nome do Produto", "Qtd", "Preço Unitário", "Subtotal" }
+				) {
+					@Override
+					public boolean isCellEditable(int row, int column) { return false; }
+				};
+
+				// 4. Listener para atualizar os Combos sempre que o usuário clicar na Aba Vendas
+				abasSistema.addChangeListener(e -> {
+					if (abasSistema.getSelectedIndex() == 2) { // Índice 2 representa a Aba de Vendas
+						carregarCombosVenda();
+					}
+				});
+				
+				
+				// =====================================================================
+				// ABA 4: CONTROLE DE CAIXA
+				// =====================================================================
+				JPanel pnlCaixa = new JPanel();
+				pnlCaixa.setLayout(null);
+				pnlCaixa.setBackground(new Color(235, 240, 245));
+				abasSistema.addTab("Controle de Caixa", null, pnlCaixa, "Abertura e Fechamento de Caixa");
+
+				// Painel de Status
+				JPanel pnlStatusCard = new JPanel();
+				pnlStatusCard.setBorder(javax.swing.BorderFactory.createTitledBorder("Status Atual do Caixa"));
+				pnlStatusCard.setBounds(30, 30, 400, 120);
+				pnlStatusCard.setLayout(null);
+				pnlCaixa.add(pnlStatusCard);
+
+				lblStatusCaixa = new JLabel("STATUS: VERIFICANDO...");
+				lblStatusCaixa.setFont(new Font("Arial", Font.BOLD, 16));
+				lblStatusCaixa.setBounds(20, 30, 350, 25);
+				pnlStatusCard.add(lblStatusCaixa);
+
+				lblFaturamentoCaixa = new JLabel("Vendas no Turno: R$ 0.00");
+				lblFaturamentoCaixa.setFont(new Font("Arial", Font.PLAIN, 14));
+				lblFaturamentoCaixa.setBounds(20, 70, 350, 20);
+				pnlStatusCard.add(lblFaturamentoCaixa);
+
+				// Painel de Operações (Abertura)
+				JPanel pnlAcoesCaixa = new JPanel();
+				pnlAcoesCaixa.setBorder(javax.swing.BorderFactory.createTitledBorder("Abertura de Turno"));
+				pnlAcoesCaixa.setBounds(30, 180, 400, 150);
+				pnlAcoesCaixa.setLayout(null);
+				pnlCaixa.add(pnlAcoesCaixa);
+
+				JLabel lblValorIni = new JLabel("Valor Inicial (Troco): R$");
+				lblValorIni.setBounds(20, 40, 150, 20);
+				pnlAcoesCaixa.add(lblValorIni);
+
+				txtValorInicialCaixa = new JTextField();
+				txtValorInicialCaixa.setBounds(180, 40, 180, 25);
+				pnlAcoesCaixa.add(txtValorInicialCaixa);
+
+				btnAbrirCaixa = new JButton("Iniciar / Abrir Caixa");
+				btnAbrirCaixa.setBackground(new Color(60, 130, 60));
+				btnAbrirCaixa.setForeground(Color.WHITE);
+				btnAbrirCaixa.setBounds(20, 90, 340, 35);
+				pnlAcoesCaixa.add(btnAbrirCaixa);
+
+				// Botão de Fechamento solto
+				btnFecharCaixa = new JButton("🔒 Fechar Caixa e Encerrar Turno");
+				btnFecharCaixa.setBackground(new Color(150, 40, 40));
+				btnFecharCaixa.setForeground(Color.WHITE);
+				btnFecharCaixa.setFont(new Font("Arial", Font.BOLD, 13));
+				btnFecharCaixa.setBounds(30, 360, 400, 45);
+				pnlCaixa.add(btnFecharCaixa);
+				
+				
+
 		// =====================================================================
 		// ABA 3: VENDAS (Apenas um painel vazio aguardando o futuro)
 		// =====================================================================
@@ -326,194 +404,253 @@ public class TelaPrincipal extends JFrame {
 				pnlVendas.setLayout(null);
 				pnlVendas.setBackground(new Color(240, 245, 240));
 				abasSistema.addTab("Vendas", null, pnlVendas, "Efetuar Vendas e Recebimentos");
+				
+								// Seleção do Cliente
+								JLabel lblSelectCli = new JLabel("Selecionar Cliente:");
+								lblSelectCli.setBounds(30, 30, 120, 20);
+								pnlVendas.add(lblSelectCli);
+								
+												cbClientesVenda = new javax.swing.JComboBox<>();
+												cbClientesVenda.setBounds(150, 30, 300, 25);
+												pnlVendas.add(cbClientesVenda);
+												
+																// Seleção da Peça
+																JLabel lblSelectPeca = new JLabel("Selecionar Peça:");
+																lblSelectPeca.setBounds(30, 80, 120, 20);
+																pnlVendas.add(lblSelectPeca);
+																
+																				cbPecasVenda = new javax.swing.JComboBox<>();
+																				cbPecasVenda.setBounds(150, 80, 300, 25);
+																				pnlVendas.add(cbPecasVenda);
+																				
+																								// Quantidade da Venda
+																								JLabel lblQtdVenda = new JLabel("Quantidade:");
+																								lblQtdVenda.setBounds(30, 130, 120, 20);
+																								pnlVendas.add(lblQtdVenda);
+																								
+																												txtQtdVenda = new JTextField();
+																												txtQtdVenda.setBounds(150, 130, 80, 25);
+																												pnlVendas.add(txtQtdVenda);
+																												
+																																JButton btnAddCarrinho = new JButton("Adicionar ao Carrinho");
+																																btnAddCarrinho.setBounds(250, 130, 200, 25);
+																																pnlVendas.add(btnAddCarrinho);
+																																
+																																				// Tabela do Carrinho de Compras
+																																				JLabel lblCarrinho = new JLabel("Itens no Carrinho:");
+																																				lblCarrinho.setBounds(480, 10, 150, 20);
+																																				pnlVendas.add(lblCarrinho);
+																																				
+																																								JScrollPane scrollCarrinho = new JScrollPane();
+																																								scrollCarrinho.setBounds(480, 30, 850, 350);
+																																								pnlVendas.add(scrollCarrinho);
+																																								
+																																												tabelaCarrinho = new JTable(modeloCarrinho);
+																																												scrollCarrinho.setViewportView(tabelaCarrinho);
+																																												
+																																																// Painel de Fechamento / Registro de Pagamento
+																																																JPanel pnlPagamento = new JPanel();
+																																																pnlPagamento.setBorder(javax.swing.BorderFactory.createTitledBorder("Fechamento do Pedido"));
+																																																pnlPagamento.setBackground(new Color(230, 235, 230));
+																																																pnlPagamento.setBounds(480, 400, 850, 150);
+																																																pnlPagamento.setLayout(null);
+																																																pnlVendas.add(pnlPagamento);
+																																																
+																																																				lblTotalVenda = new JLabel("TOTAL GERAL: R$ 0.00");
+																																																				lblTotalVenda.setFont(new Font("Arial", Font.BOLD, 18));
+																																																				lblTotalVenda.setForeground(new Color(150, 30, 30));
+																																																				lblTotalVenda.setBounds(30, 40, 300, 30);
+																																																				pnlPagamento.add(lblTotalVenda);
+																																																				
+																																																								JLabel lblFormaPag = new JLabel("Forma de Pagamento:");
+																																																								lblFormaPag.setBounds(30, 90, 150, 20);
+																																																								pnlPagamento.add(lblFormaPag);
+																																																								
+																																																												cbPagamento = new javax.swing.JComboBox<>(new String[] { "Dinheiro", "Cartão de Crédito", "Cartão de Débito", "Pix" });
+																																																												cbPagamento.setBounds(180, 90, 180, 25);
+																																																												pnlPagamento.add(cbPagamento);
+																																																												
+																																																																JButton btnFinalizarVenda = new JButton("✨ Finalizar e Registrar Venda");
+																																																																btnFinalizarVenda.setBackground(new Color(50, 120, 50));
+																																																																btnFinalizarVenda.setForeground(Color.WHITE);
+																																																																btnFinalizarVenda.setFont(new Font("Arial", Font.BOLD, 14));
+																																																																btnFinalizarVenda.setBounds(550, 50, 250, 60);
+																																																																pnlPagamento.add(btnFinalizarVenda);
+																																																																
+																																																																				// Button para esvaziar carrinho
+																																																																				JButton btnLimparCarrinho = new JButton("Limpar Carrinho");
+																																																																				btnLimparCarrinho.setBounds(30, 180, 150, 25);
+																																																																				pnlVendas.add(btnLimparCarrinho);
+																																																																				
+																																																																				
 
-				// Seleção do Cliente
-				JLabel lblSelectCli = new JLabel("Selecionar Cliente:");
-				lblSelectCli.setBounds(30, 30, 120, 20);
-				pnlVendas.add(lblSelectCli);
+																																																																				// =====================================================================
+																																																																				// LÓGICAS DA ABA DE VENDAS
+																																																																				// =====================================================================
 
-				cbClientesVenda = new javax.swing.JComboBox<>();
-				cbClientesVenda.setBounds(150, 30, 300, 25);
-				pnlVendas.add(cbClientesVenda);
+																																																																				
+																																																																				
+																																																																				// 1. Ação de Adicionar Peça ao Carrinho
+																																																																				btnAddCarrinho.addActionListener(e -> {
+																																																																					int indexPeca = cbPecasVenda.getSelectedIndex();
+																																																																					if (indexPeca < 0) return;
+																																																																					
+																																																																					String qtdStr = txtQtdVenda.getText().trim();
+																																																																					if (qtdStr.isEmpty()) {
+																																																																						JOptionPane.showMessageDialog(this, "Informe a quantidade desejada!");
+																																																																						return;
+																																																																					}
 
-				// Seleção da Peça
-				JLabel lblSelectPeca = new JLabel("Selecionar Peça:");
-				lblSelectPeca.setBounds(30, 80, 120, 20);
-				pnlVendas.add(lblSelectPeca);
+																																																																					try {
+																																																																						int qtdDesejada = Integer.parseInt(qtdStr);
+																																																																						Object[] pecaSelecionada = listaDadosPecas.get(indexPeca);
+																																																																						
+																																																																						int idPeca = (int) pecaSelecionada[0];
+																																																																						String nomePeca = pecaSelecionada[1].toString();
+																																																																						int estoqueAtual = (int) pecaSelecionada[2];
+																																																																						double precoUnit = (double) pecaSelecionada[3];
 
-				cbPecasVenda = new javax.swing.JComboBox<>();
-				cbPecasVenda.setBounds(150, 80, 300, 25);
-				pnlVendas.add(cbPecasVenda);
+																																																																						if (qtdDesejada <= 0) {
+																																																																							JOptionPane.showMessageDialog(this, "A quantidade deve ser maior que zero!");
+																																																																							return;
+																																																																						}
 
-				// Quantidade da Venda
-				JLabel lblQtdVenda = new JLabel("Quantidade:");
-				lblQtdVenda.setBounds(30, 130, 120, 20);
-				pnlVendas.add(lblQtdVenda);
+																																																																						if (qtdDesejada > estoqueAtual) {
+																																																																							JOptionPane.showMessageDialog(this, "Estoque insuficiente! Estoque atual: " + estoqueAtual);
+																																																																							return;
+																																																																						}
 
-				txtQtdVenda = new JTextField();
-				txtQtdVenda.setBounds(150, 130, 80, 25);
-				pnlVendas.add(txtQtdVenda);
+																																																																						double subtotal = qtdDesejada * precoUnit;
+																																																																						
+																																																																						// Adiciona o item na tabela do carrinho
+																																																																						modeloCarrinho.addRow(new Object[] { idPeca, nomePeca, qtdDesejada, precoUnit, subtotal });
+																																																																						
+																																																																						// Atualiza o total acumulado
+																																																																						totalGeralVenda += subtotal;
+																																																																						lblTotalVenda.setText(String.format("TOTAL GERAL: R$ %.2f", totalGeralVenda));
+																																																																						txtQtdVenda.setText("");
 
-				JButton btnAddCarrinho = new JButton("Adicionar ao Carrinho");
-				btnAddCarrinho.setBounds(250, 130, 200, 25);
-				pnlVendas.add(btnAddCarrinho);
-
-				// Tabela do Carrinho de Compras
-				JLabel lblCarrinho = new JLabel("Itens no Carrinho:");
-				lblCarrinho.setBounds(480, 10, 150, 20);
-				pnlVendas.add(lblCarrinho);
-
-				JScrollPane scrollCarrinho = new JScrollPane();
-				scrollCarrinho.setBounds(480, 30, 850, 350);
-				pnlVendas.add(scrollCarrinho);
-
-				modeloCarrinho = new DefaultTableModel(
-					new Object[][] {},
-					new String[] { "ID Peça", "Nome do Produto", "Qtd", "Preço Unitário", "Subtotal" }
-				) {
-					@Override
-					public boolean isCellEditable(int row, int column) { return false; }
-				};
-
-				tabelaCarrinho = new JTable(modeloCarrinho);
-				scrollCarrinho.setViewportView(tabelaCarrinho);
-
-				// Painel de Fechamento / Registro de Pagamento
-				JPanel pnlPagamento = new JPanel();
-				pnlPagamento.setBorder(javax.swing.BorderFactory.createTitledBorder("Fechamento do Pedido"));
-				pnlPagamento.setBackground(new Color(230, 235, 230));
-				pnlPagamento.setBounds(480, 400, 850, 150);
-				pnlPagamento.setLayout(null);
-				pnlVendas.add(pnlPagamento);
-
-				lblTotalVenda = new JLabel("TOTAL GERAL: R$ 0.00");
-				lblTotalVenda.setFont(new Font("Arial", Font.BOLD, 18));
-				lblTotalVenda.setForeground(new Color(150, 30, 30));
-				lblTotalVenda.setBounds(30, 40, 300, 30);
-				pnlPagamento.add(lblTotalVenda);
-
-				JLabel lblFormaPag = new JLabel("Forma de Pagamento:");
-				lblFormaPag.setBounds(30, 90, 150, 20);
-				pnlPagamento.add(lblFormaPag);
-
-				cbPagamento = new javax.swing.JComboBox<>(new String[] { "Dinheiro", "Cartão de Crédito", "Cartão de Débito", "Pix" });
-				cbPagamento.setBounds(180, 90, 180, 25);
-				pnlPagamento.add(cbPagamento);
-
-				JButton btnFinalizarVenda = new JButton("✨ Finalizar e Registrar Venda");
-				btnFinalizarVenda.setBackground(new Color(50, 120, 50));
-				btnFinalizarVenda.setForeground(Color.WHITE);
-				btnFinalizarVenda.setFont(new Font("Arial", Font.BOLD, 14));
-				btnFinalizarVenda.setBounds(550, 50, 250, 60);
-				pnlPagamento.add(btnFinalizarVenda);
-
-				// Button para esvaziar carrinho
-				JButton btnLimparCarrinho = new JButton("Limpar Carrinho");
-				btnLimparCarrinho.setBounds(30, 180, 150, 25);
-				pnlVendas.add(btnLimparCarrinho);
+																																																																					} catch (NumberFormatException ex) {
+																																																																						JOptionPane.showMessageDialog(this, "Digite uma quantidade numérica válida!");
+																																																																					}
+																																																																				});
+																																																																				
+																																																																								// 2. Ação de Limpar o Carrinho
+																																																																								btnLimparCarrinho.addActionListener(e -> {
+																																																																									modeloCarrinho.setRowCount(0);
+																																																																									totalGeralVenda = 0.0;
+																																																																									lblTotalVenda.setText("TOTAL GERAL: R$ 0.00");
+																																																																								});
+																																																																								
+																																																																								JButton btnAbrirHistorico = new JButton("📄 Histórico de Vendas");
+																																																																								btnAbrirHistorico.setBackground(new Color(70, 90, 120));
+																																																																								btnAbrirHistorico.setForeground(Color.WHITE);
+																																																																								btnAbrirHistorico.setFont(new Font("Arial", Font.BOLD, 12));
+																																																																								btnAbrirHistorico.setBounds(30, 539, 187, 35); // Posicionado logo abaixo do limpar carrinho
+																																																																								pnlVendas.add(btnAbrirHistorico);
+																																																																								
+																																																																								btnAbrirHistorico.addActionListener(e -> {
+																																																																									JanelaHistoricoVendas janelaHist = new JanelaHistoricoVendas(this);
+																																																																									janelaHist.setVisible(true); // Abre a janela de histórico por cima do sistema
+																																																																								});
+																																																																								
+																																																																												// 3. Ação do Botão de Finalizar Venda
+																																																																												btnFinalizarVenda.addActionListener(e -> {
+																																																																												    // === NOVA TRAVA DE SEGURANÇA ===
+																																																																												    DAOAutoPeças.CaixaDAO caixaDAO = new DAOAutoPeças.CaixaDAO();
+																																																																												    if (caixaDAO.obterIdCaixaAberto() == -1) {
+																																																																												        JOptionPane.showMessageDialog(this, 
+																																																																												            "Ação Bloqueada!\nO caixa está FECHADO. Vá até a aba 'Controle de Caixa' e abra o turno antes de vender.", 
+																																																																												            "Caixa Fechado", JOptionPane.WARNING_MESSAGE);
+																																																																												        return; // Cancela a venda e não deixa executar o código abaixo
+																																																																												    }
+																																																																													
+																																																																													if (cbClientesVenda.getSelectedIndex() < 0) {
+																																																																														JOptionPane.showMessageDialog(this, "Cadastre um cliente antes de realizar uma venda!");
+																																																																														return;
+																																																																													}
+																																																																													if (modeloCarrinho.getRowCount() == 0) {
+																																																																														JOptionPane.showMessageDialog(this, "O carrinho está vazio! Adicione itens para vender.");
+																																																																														return;
+																																																																													}
+																																																																								
+																																																																													int clienteId = listaIdsClientes.get(cbClientesVenda.getSelectedIndex());
+																																																																													String formaPagto = cbPagamento.getSelectedItem().toString();
+																																																																								
+																																																																													// Extrai a lista de itens do carrinho para enviar ao DAO
+																																																																													java.util.List<Object[]> itensCarrinho = new java.util.ArrayList<>();
+																																																																													for (int i = 0; i < modeloCarrinho.getRowCount(); i++) {
+																																																																														int pecaId = (int) modeloCarrinho.getValueAt(i, 0);
+																																																																														int qtd = (int) modeloCarrinho.getValueAt(i, 2);
+																																																																														double preco = (double) modeloCarrinho.getValueAt(i, 3);
+																																																																														itensCarrinho.add(new Object[] { pecaId, null, qtd, preco });
+																																																																													}
+																																																																								
+																																																																													DAOAutoPeças.VendaDAO vendaDAO = new DAOAutoPeças.VendaDAO();
+																																																																													if (vendaDAO.registrarVenda(clienteId, totalGeralVenda, formaPagto, itensCarrinho)) {
+																																																																														JOptionPane.showMessageDialog(this, "Venda registrada e paga com sucesso!\nEstoque atualizado.");
+																																																																														
+																																																																														// Reseta os componentes de venda
+																																																																														modeloCarrinho.setRowCount(0);
+																																																																														totalGeralVenda = 0.0;
+																																																																														lblTotalVenda.setText("TOTAL GERAL: R$ 0.00");
+																																																																														
+																																																																														// Atualiza os componentes globais e a tabela da aba de estoque de peças
+																																																																														carregarCombosVenda();
+																																																																														atualizarTabelaVisual(); 
+																																																																													} else {
+																																																																														JOptionPane.showMessageDialog(this, "Erro crítico ao processar o fechamento da venda.", "Erro", JOptionPane.ERROR_MESSAGE);
+																																																																													}
+																																																																												});
 
 				// =====================================================================
-				// LÓGICAS DA ABA DE VENDAS
+				// LÓGICAS DA ABA DE CONTROLE DE CAIXA
 				// =====================================================================
 
-				
-				
-				// 1. Ação de Adicionar Peça ao Carrinho
-				btnAddCarrinho.addActionListener(e -> {
-					int indexPeca = cbPecasVenda.getSelectedIndex();
-					if (indexPeca < 0) return;
-					
-					String qtdStr = txtQtdVenda.getText().trim();
-					if (qtdStr.isEmpty()) {
-						JOptionPane.showMessageDialog(this, "Informe a quantidade desejada!");
+				// 1. Ação de Abrir Caixa
+				btnAbrirCaixa.addActionListener(e -> {
+					String valorStr = txtValorInicialCaixa.getText().trim();
+					if (valorStr.isEmpty()) {
+						JOptionPane.showMessageDialog(this, "Informe um valor de troco inicial para abrir o caixa! (Ex: 0 ou 50.00)");
 						return;
 					}
-
 					try {
-						int qtdDesejada = Integer.parseInt(qtdStr);
-						Object[] pecaSelecionada = listaDadosPecas.get(indexPeca);
-						
-						int idPeca = (int) pecaSelecionada[0];
-						String nomePeca = pecaSelecionada[1].toString();
-						int estoqueAtual = (int) pecaSelecionada[2];
-						double precoUnit = (double) pecaSelecionada[3];
-
-						if (qtdDesejada <= 0) {
-							JOptionPane.showMessageDialog(this, "A quantidade deve ser maior que zero!");
-							return;
+						double valorInicial = Double.parseDouble(valorStr.replace(",", "."));
+						DAOAutoPeças.CaixaDAO caixaDAO = new DAOAutoPeças.CaixaDAO();
+						if (caixaDAO.abrirCaixa(valorInicial)) {
+							JOptionPane.showMessageDialog(this, "Caixa aberto com sucesso! Vendas liberadas.");
+							txtValorInicialCaixa.setText("");
+							// Executa o método de atualização da interface do caixa (vamos criá-lo no passo 5)
+							atualizarInterfaceCaixa(); 
 						}
-
-						if (qtdDesejada > estoqueAtual) {
-							JOptionPane.showMessageDialog(this, "Estoque insuficiente! Estoque atual: " + estoqueAtual);
-							return;
-						}
-
-						double subtotal = qtdDesejada * precoUnit;
-						
-						// Adiciona o item na tabela do carrinho
-						modeloCarrinho.addRow(new Object[] { idPeca, nomePeca, qtdDesejada, precoUnit, subtotal });
-						
-						// Atualiza o total acumulado
-						totalGeralVenda += subtotal;
-						lblTotalVenda.setText(String.format("TOTAL GERAL: R$ %.2f", totalGeralVenda));
-						txtQtdVenda.setText("");
-
 					} catch (NumberFormatException ex) {
-						JOptionPane.showMessageDialog(this, "Digite uma quantidade numérica válida!");
+						JOptionPane.showMessageDialog(this, "Valor inicial inválido!");
 					}
 				});
 
-				// 2. Ação de Limpar o Carrinho
-				btnLimparCarrinho.addActionListener(e -> {
-					modeloCarrinho.setRowCount(0);
-					totalGeralVenda = 0.0;
-					lblTotalVenda.setText("TOTAL GERAL: R$ 0.00");
-				});
+				// 2. Ação de Fechar Caixa
+				btnFecharCaixa.addActionListener(e -> {
+					DAOAutoPeças.CaixaDAO caixaDAO = new DAOAutoPeças.CaixaDAO();
+					int idCaixa = caixaDAO.obterIdCaixaAberto();
+					if (idCaixa == -1) return;
 
-				// 3. Ação do Botão de Finalizar Venda
-				btnFinalizarVenda.addActionListener(e -> {
-					if (cbClientesVenda.getSelectedIndex() < 0) {
-						JOptionPane.showMessageDialog(this, "Cadastre um cliente antes de realizar uma venda!");
-						return;
-					}
-					if (modeloCarrinho.getRowCount() == 0) {
-						JOptionPane.showMessageDialog(this, "O carrinho está vazio! Adicione itens para vender.");
-						return;
-					}
+					double vendas = caixaDAO.calcularVendasDoCaixaAtual();
+					int confirmar = JOptionPane.showConfirmDialog(this, 
+						String.format("Deseja fechar o caixa?\nFaturamento de vendas registrado: R$ %.2f\nConfirma o fechamento?", vendas),
+						"Confirmação de Fechamento", JOptionPane.YES_NO_OPTION);
 
-					int clienteId = listaIdsClientes.get(cbClientesVenda.getSelectedIndex());
-					String formaPagto = cbPagamento.getSelectedItem().toString();
-
-					// Extrai a lista de itens do carrinho para enviar ao DAO
-					java.util.List<Object[]> itensCarrinho = new java.util.ArrayList<>();
-					for (int i = 0; i < modeloCarrinho.getRowCount(); i++) {
-						int pecaId = (int) modeloCarrinho.getValueAt(i, 0);
-						int qtd = (int) modeloCarrinho.getValueAt(i, 2);
-						double preco = (double) modeloCarrinho.getValueAt(i, 3);
-						itensCarrinho.add(new Object[] { pecaId, null, qtd, preco });
-					}
-
-					DAOAutoPeças.VendaDAO vendaDAO = new DAOAutoPeças.VendaDAO();
-					if (vendaDAO.registrarVenda(clienteId, totalGeralVenda, formaPagto, itensCarrinho)) {
-						JOptionPane.showMessageDialog(this, "Venda registrada e paga com sucesso!\nEstoque atualizado.");
-						
-						// Reseta os componentes de venda
-						modeloCarrinho.setRowCount(0);
-						totalGeralVenda = 0.0;
-						lblTotalVenda.setText("TOTAL GERAL: R$ 0.00");
-						
-						// Atualiza os componentes globais e a tabela da aba de estoque de peças
-						carregarCombosVenda();
-						atualizarTabelaVisual(); 
-					} else {
-						JOptionPane.showMessageDialog(this, "Erro crítico ao processar o fechamento da venda.", "Erro", JOptionPane.ERROR_MESSAGE);
+					if (confirmar == JOptionPane.YES_OPTION) {
+						if (caixaDAO.fecharCaixa(idCaixa, vendas)) {
+							JOptionPane.showMessageDialog(this, "Caixa encerrado com sucesso!");
+							atualizarInterfaceCaixa();
+						}
 					}
 				});
 
-				// 4. Listener para atualizar os Combos sempre que o usuário clicar na Aba Vendas
+				// 3. Listener para monitorar quando o usuário entra na aba de Caixa
 				abasSistema.addChangeListener(e -> {
-					if (abasSistema.getSelectedIndex() == 2) { // Índice 2 representa a Aba de Vendas
-						carregarCombosVenda();
+					if (abasSistema.getSelectedIndex() == 3) { // Índice 3 é a aba Caixa
+						atualizarInterfaceCaixa();
 					}
 				});
 				
@@ -675,4 +812,32 @@ public class TelaPrincipal extends JFrame {
 	        cbPecasVenda.addItem(p[1].toString() + " - R$ " + p[3].toString() + " [Qtd: " + p[2].toString() + "]");
 	    }
 	}
+	
+	private void atualizarInterfaceCaixa() {
+	    DAOAutoPeças.CaixaDAO caixaDAO = new DAOAutoPeças.CaixaDAO();
+	    int idCaixaAberto = caixaDAO.obterIdCaixaAberto();
+
+	    if (idCaixaAberto == -1) {
+	        // Caixa está FECHADO
+	        lblStatusCaixa.setText("STATUS: 🔴 FECHADO");
+	        lblStatusCaixa.setForeground(new Color(150, 30, 30));
+	        lblFaturamentoCaixa.setText("Vendas no Turno: Bloqueado");
+	        
+	        btnAbrirCaixa.setEnabled(true);
+	        txtValorInicialCaixa.setEditable(true);
+	        btnFecharCaixa.setEnabled(false);
+	    } else {
+	        // Caixa está ABERTO
+	        lblStatusCaixa.setText("STATUS: 🟢 ABERTO (Turno Ativo)");
+	        lblStatusCaixa.setForeground(new Color(30, 120, 30));
+	        
+	        double faturamento = caixaDAO.calcularVendasDoCaixaAtual();
+	        lblFaturamentoCaixa.setText(String.format("Vendas no Turno: R$ %.2f", faturamento));
+	        
+	        btnAbrirCaixa.setEnabled(false);
+	        txtValorInicialCaixa.setEditable(false);
+	        btnFecharCaixa.setEnabled(true);
+	    }
+	}
+
 }

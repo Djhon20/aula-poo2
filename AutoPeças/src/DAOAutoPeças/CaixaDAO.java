@@ -4,25 +4,46 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import ConAutoPeças.ConnectionFactory;
 
-public class ClienteDAO {
+public class CaixaDAO {
 
-    // Salvar Cliente
-    public boolean salvar(String nome, String cpf, String endereco, String telefone) {
+    public int obterIdCaixaAberto() {
         Connection conn = null;
         PreparedStatement pstm = null;
-        String sql = "INSERT INTO clientes (nome, cpf, endereco, telefone) VALUES (?, ?, ?, ?)";
+        ResultSet rs = null;
+        int id = -1;
+        String sql = "SELECT id FROM controle_caixa WHERE status = 'ABERTO'";
 
         try {
             conn = ConnectionFactory.getConnection();
             pstm = conn.prepareStatement(sql);
-            pstm.setString(1, nome);
-            pstm.setString(2, cpf);
-            pstm.setString(3, endereco);
-            pstm.setString(4, telefone);
+            rs = pstm.executeQuery();
+            if (rs.next()) {
+                id = rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {}
+            try { if (pstm != null) pstm.close(); } catch (Exception e) {}
+            try { if (conn != null) conn.close(); } catch (Exception e) {}
+        }
+        return id;
+    }
+
+    // Abre o caixa com um valor inicial de troco
+    public boolean abrirCaixa(double valorInicial) {
+        if (obterIdCaixaAberto() != -1) return false; // Já tem caixa aberto
+
+        Connection conn = null;
+        PreparedStatement pstm = null;
+        String sql = "INSERT INTO controle_caixa (valor_inicial, status) VALUES (?, 'ABERTO')";
+
+        try {
+            conn = ConnectionFactory.getConnection();
+            pstm = conn.prepareStatement(sql);
+            pstm.setDouble(1, valorInicial);
             pstm.execute();
             return true;
         } catch (SQLException e) {
@@ -34,54 +55,23 @@ public class ClienteDAO {
         }
     }
 
-    // Editar Cliente
-    public boolean editar(int id, String nome, String cpf, String endereco, String telefone) {
-        Connection conn = null;
-        PreparedStatement pstm = null;
-        String sql = "UPDATE clientes SET nome = ?, cpf = ?, endereco = ?, telefone = ? WHERE id = ?";
-
-        try {
-            conn = ConnectionFactory.getConnection();
-            pstm = conn.prepareStatement(sql);
-            pstm.setString(1, nome);
-            pstm.setString(2, cpf);
-            pstm.setString(3, endereco);
-            pstm.setString(4, telefone);
-            pstm.setInt(5, id);
-            return pstm.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            try { if (pstm != null) pstm.close(); } catch (Exception e) {}
-            try { if (conn != null) conn.close(); } catch (Exception e) {}
-        }
-    }
-
-    // Buscar Clientes por Nome (Filtro Dinâmico)
-    public List<Object[]> buscarPorNome(String nomeBusca) {
+    // Calcula quanto dinheiro entrou em vendas enquanto este caixa esteve aberto
+    public double calcularVendasDoCaixaAtual() {
         Connection conn = null;
         PreparedStatement pstm = null;
         ResultSet rs = null;
-        List<Object[]> lista = new ArrayList<>();
-        // O LIKE %?% permite buscar por partes do nome (ex: digita "Silva" e acha "João Silva")
-        String sql = "SELECT * FROM clientes WHERE nome LIKE ?";
+        double totalVendas = 0.0;
+        
+        // Soma as vendas que aconteceram depois da data de abertura do caixa atual
+        String sql = "SELECT SUM(total) as total_vendas FROM vendas WHERE data_venda >= "
+                   + "(SELECT data_abertura FROM controle_caixa WHERE status = 'ABERTO')";
 
         try {
             conn = ConnectionFactory.getConnection();
             pstm = conn.prepareStatement(sql);
-            pstm.setString(1, "%" + nomeBusca + "%");
             rs = pstm.executeQuery();
-
-            while (rs.next()) {
-                Object[] linha = new Object[] {
-                    rs.getInt("id"),
-                    rs.getString("nome"),
-                    rs.getString("cpf"),
-                    rs.getString("endereco"),
-                    rs.getString("telefone")
-                };
-                lista.add(linha);
+            if (rs.next()) {
+                totalVendas = rs.getDouble("total_vendas");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -90,17 +80,20 @@ public class ClienteDAO {
             try { if (pstm != null) pstm.close(); } catch (Exception e) {}
             try { if (conn != null) conn.close(); } catch (Exception e) {}
         }
-        return lista;
+        return totalVendas;
     }
-    public boolean excluir(int id) {
+
+    // Fecha o caixa salvando o valor final acumulado e alterando o status
+    public boolean fecharCaixa(int idCaixa, double valorFinal) {
         Connection conn = null;
         PreparedStatement pstm = null;
-        String sql = "DELETE FROM clientes WHERE id = ?";
+        String sql = "UPDATE controle_caixa SET valor_final = ?, status = 'FECHADO', data_fechamento = datetime('now', 'localtime') WHERE id = ?";
 
         try {
             conn = ConnectionFactory.getConnection();
             pstm = conn.prepareStatement(sql);
-            pstm.setInt(1, id);
+            pstm.setDouble(1, valorFinal);
+            pstm.setInt(2, idCaixa);
             return pstm.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

@@ -18,13 +18,14 @@ public class ModalCliente extends JDialog {
     private JTextField txtNome, txtCpf, txtEndereco, txtTelefone;
     private JButton btnAcao;
     private boolean salvouComSucesso = false;
+    private JButton btnExcluir;
     
     private int idClienteEdicao = -1; // Se continuar -1 significa que é Cadastro
 
     // Construtor do Modal
     public ModalCliente(JFrame pai, String titulo) {
         super(pai, titulo, true); // O "true" ativa o modo Modal (bloqueia a tela de trás)
-        setBounds(100, 100, 400, 350);
+        setBounds(100, 100, 400, 359);
         setLocationRelativeTo(pai);
         setResizable(false);
         
@@ -81,6 +82,8 @@ public class ModalCliente extends JDialog {
                 JOptionPane.showMessageDialog(this, "Nome e CPF são obrigatórios!", "Aviso", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            
+            
 
             ClienteDAO dao = new ClienteDAO();
             boolean ok;
@@ -98,6 +101,30 @@ public class ModalCliente extends JDialog {
                 JOptionPane.showMessageDialog(this, "Erro ao processar dados. Verifique o CPF.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
         });
+        btnExcluir = new JButton("Excluir Cliente");
+        btnExcluir.setBackground(new Color(180, 50, 50));
+        btnExcluir.setForeground(Color.WHITE);
+        btnExcluir.setFont(new Font("Arial", Font.BOLD, 11));
+        btnExcluir.setBounds(124, 286, 120, 25); // Posicionado no canto esquerdo inferior
+        btnExcluir.setVisible(false); // NASCE OCULTO (só aparece se for Edição)
+        pnlForm.add(btnExcluir);
+
+        // Lógica do botão Excluir do Modal
+        btnExcluir.addActionListener(e -> {
+            int confirmacao = JOptionPane.showConfirmDialog(this, 
+                "Deseja realmente excluir este cliente em definitivo?", 
+                "Confirmar Exclusão", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+            if (confirmacao == JOptionPane.YES_OPTION) {
+                ClienteDAO dao = new ClienteDAO();
+                if (dao.excluir(idClienteEdicao)) {
+                    salvouComSucesso = true; // Ativamos para forçar a atualização da tabela principal
+                    dispose(); // Fecha o modal
+                } else {
+                    JOptionPane.showMessageDialog(this, "Erro ao tentar excluir o cliente.", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
     }
 
     // Método para preparar o modal em Modo Edição preenchendo os campos
@@ -108,9 +135,11 @@ public class ModalCliente extends JDialog {
         txtEndereco.setText(endereco);
         txtTelefone.setText(telefone);
         btnAcao.setText("Atualizar");
+        btnExcluir.setVisible(true);
     }
 
     public boolean isSalvouComSucesso() {
         return salvouComSucesso;
     }
+    
 }

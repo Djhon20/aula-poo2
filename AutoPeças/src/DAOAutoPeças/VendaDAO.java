@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import ConAutoPeças.ConnectionFactory;
 
@@ -77,5 +78,73 @@ public class VendaDAO {
             try { if (pstmEstoque != null) pstmEstoque.close(); } catch (Exception e) {}
             try { if (conn != null) conn.close(); } catch (Exception e) {}
         }
+    }
+    public List<Object[]> listarVendasPorCaixa(int idCaixa) {
+        Connection conn = null;
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        List<Object[]> lista = new ArrayList<>();
+        
+        // Busca as vendas que batem com o período de abertura/fechamento do caixa selecionado
+        String sql = "SELECT v.id, c.nome, v.data_venda, v.total, v.forma_pagamento " +
+                     "FROM vendas v " +
+                     "JOIN clientes c ON v.cliente_id = c.id " +
+                     "WHERE v.data_venda >= (SELECT data_abertura FROM controle_caixa WHERE id = ?) " +
+                     "AND (v.data_venda <= (SELECT data_fechamento FROM controle_caixa WHERE id = ?) " +
+                     "     OR (SELECT status FROM controle_caixa WHERE id = ?) = 'ABERTO') " +
+                     "ORDER BY v.data_venda DESC";
+
+        try {
+            conn = ConnectionFactory.getConnection();
+            pstm = conn.prepareStatement(sql);
+            pstm.setInt(1, idCaixa);
+            pstm.setInt(2, idCaixa);
+            pstm.setInt(3, idCaixa);
+            rs = pstm.executeQuery();
+
+            while (rs.next()) {
+                lista.add(new Object[] {
+                    rs.getInt("id"),
+                    rs.getString("nome"),
+                    rs.getString("data_venda"),
+                    rs.getDouble("total"),
+                    rs.getString("forma_pagamento")
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {}
+            try { if (pstm != null) pstm.close(); } catch (Exception e) {}
+            try { if (conn != null) conn.close(); } catch (Exception e) {}
+        }
+        return lista;
+    }
+    public List<Object[]> listarPeriodosCaixa() {
+        Connection conn = null;
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        List<Object[]> lista = new ArrayList<>();
+        String sql = "SELECT id, data_abertura, status FROM controle_caixa ORDER BY id DESC";
+
+        try {
+            conn = ConnectionFactory.getConnection();
+            pstm = conn.prepareStatement(sql);
+            rs = pstm.executeQuery();
+            while (rs.next()) {
+                lista.add(new Object[]{
+                    rs.getInt("id"),
+                    rs.getString("data_abertura"),
+                    rs.getString("status")
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {}
+            try { if (pstm != null) pstm.close(); } catch (Exception e) {}
+            try { if (conn != null) conn.close(); } catch (Exception e) {}
+        }
+        return lista;
     }
 }
